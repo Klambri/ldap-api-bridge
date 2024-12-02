@@ -13,24 +13,22 @@ func main() {
 }
 
 func Test() {
+	err := ldapconnector.NewInstance("ldaps://klambri.lan", "Administrator@klambri.lan", "P@ssw0rd")
 
-	l, err := ldapconnector.CreateConnector("ldaps://klambri.lan", "Administrator@klambri.lan", "P@ssw0rd")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer l.Close()
 
 	searchRequest := ldap.NewSearchRequest(
 		"cn=Users,dc=klambri,dc=lan", ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false, "(cn=Administrator)", []string{"cn", "dn"}, nil,
 	)
 
-	result, err := l.Search(searchRequest)
+	result, err := ldapconnector.GetInstance().Search(searchRequest)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, entry := range result.Entries {
 		fmt.Println(entry.DN)
-		// fmt.Printf("%s: %v\n", entry.DN, entry.GetAttributeValue("cn"))
 	}
 }

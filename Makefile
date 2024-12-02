@@ -4,3 +4,6 @@ create-vm:
 
 destroy-vm:
 	VAGRANT_CWD=$(CURDIR)/test/vagrant vagrant destroy -f
+
+run:
+	go run cmd/ldap-api-bridge/ldap-api-bridge.go
