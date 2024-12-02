@@ -6,7 +6,9 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-func CreateConnector(url string, username string, password string) (connector *ldap.Conn, err error) {
+var connector *ldap.Conn
+
+func NewInstance(url string, username string, password string) error {
 	l, err := ldap.DialURL(url)
 
 	if err != nil {
@@ -19,5 +21,10 @@ func CreateConnector(url string, username string, password string) (connector *l
 		log.Fatal(err)
 	}
 
-	return l, err
+	connector = l
+	return err
+}
+
+func GetInstance() *ldap.Conn {
+	return connector
 }
