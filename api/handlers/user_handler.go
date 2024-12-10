@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-ldap/ldap/v3"
 	ldapconnector "github.com/klambri/ldap-api-bridge/internal/ldap-connector"
+	"github.com/klambri/ldap-api-bridge/internal/models"
 )
 
 func GetUsers(c *gin.Context) {
@@ -31,7 +33,26 @@ func GetUsers(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
-	c.JSON(http.StatusCreated, "create_user")
+
+	var user models.User
+
+	if err := c.BindJSON(&user); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(user.Username)
+
+	connector := ldapconnector.GetInstance()
+
+	// todo: Password
+	addReq := ldap.NewAddRequest(fmt.Sprintf("CN=%v,CN=Users,DC=klambri,DC=lan", user.Username), nil)
+	addReq.Attribute("objectClass", []string{"top", "person", "organizationalPerson", "user"})
+
+	if err := connector.Add(addReq); err != nil {
+		log.Fatal(err)
+	}
+
+	c.JSON(http.StatusCreated, user)
 }
 
 func UpdateUser(c *gin.Context) {
