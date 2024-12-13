@@ -5,3 +5,12 @@ content-type: application/json
     "username": "Test-User1",
     "password": "TestP@ssw0rd"
 }
+
+###
+DELETE http://localhost:8080/v1/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "Test-User1",
+    "password": "TestP@ssw0rd"
+}
