@@ -13,7 +13,7 @@ import (
 
 func GetUsers(c *gin.Context) {
 	searchRequest := ldap.NewSearchRequest(
-		"cn=Users,dc=klambri,dc=lan", ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false, "(|(objectClass=person)(objectClass=user))", []string{"cn", "dn"}, nil,
+		"dc=klambri,dc=lan", ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false, "(|(objectClass=person)(objectClass=user))", []string{"cn", "dn"}, nil,
 	)
 
 	result, err := ldapconnector.GetInstance().Search(searchRequest)
@@ -33,7 +33,6 @@ func GetUsers(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
-
 	var user models.User
 
 	if err := c.BindJSON(&user); err != nil {
@@ -60,5 +59,21 @@ func UpdateUser(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	c.JSON(http.StatusOK, "delete_user")
+	var user models.User
+
+	if err := c.BindJSON(&user); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(user.Username)
+
+	connector := ldapconnector.GetInstance()
+
+	delReq := ldap.NewDelRequest(fmt.Sprintf("CN=%v,CN=Users,DC=klambri,DC=lan", user.Username), nil)
+
+	if err := connector.Del(delReq); err != nil {
+		log.Fatal(err)
+	}
+
+	c.JSON(http.StatusCreated, user)
 }
